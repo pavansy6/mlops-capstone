@@ -1,14 +1,26 @@
 import pickle
 import pandas as pd
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
 import logging
+# New imports for the exception handler
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 # Configure logging
 logging.basicConfig(filename='predictions.log', level=logging.INFO, 
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 app = FastAPI()
+
+# --- NEW EXCEPTION HANDLER ---
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    logging.error(f"Validation error for request to {request.url}: {exc.errors()}")
+    return JSONResponse(
+        status_code=422,
+        content={"detail": exc.errors()},
+    )
 
 # Define the input data model
 class IrisInput(BaseModel):
@@ -29,22 +41,15 @@ except FileNotFoundError:
 def read_root():
     return {"message": "Welcome to the Iris Prediction API"}
 
+# The predict endpoint is now simpler as we don't need the try/except
 @app.post("/predict")
 def predict(data: IrisInput):
     if model is None:
-        logging.error("Prediction failed: Model is not loaded.")
         return {"error": "Model not loaded. Please train the model first."}
 
-    # Create a DataFrame from the input
     input_df = pd.DataFrame([data.dict()])
-    # Rename columns to match training data
     input_df.columns = ['sepal.length', 'sepal.width', 'petal.length', 'petal.width']
-
-    try:
-        # Get prediction
-        prediction = model.predict(input_df)[0]
-        logging.info(f"Prediction successful for input {data.dict()}. Result: {prediction}")
-        return {"prediction": prediction}
-    except Exception as e:
-        logging.error(f"Prediction failed for input {data.dict()}. Error: {str(e)}")
-        return {"error": str(e)}
+    
+    prediction = model.predict(input_df)[0]
+    logging.info(f"Prediction successful for input {data.dict()}. Result: {prediction}")
+    return {"prediction": prediction}
