@@ -1,0 +1,21 @@
+# DVC
+.dvc/
+.dvcignore
+/data/dataset.csv 
+
+# MLflow
+.mlruns/
+mlruns/
+
+# Python
+__pycache__/
+*.pyc
+.env
+venv/
+*.pkl
+*.log
+
+# Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
