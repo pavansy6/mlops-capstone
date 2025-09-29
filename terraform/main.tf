@@ -10,7 +10,7 @@ terraform {
 provider "docker" {}
 
 resource "docker_image" "mlops_app_image" {
-  name         = "<your-dockerhub-username>/mlops-capstone:latest"
+  name         = "pavansyadav/mlops-capstone:latest"
   keep_locally = false
 }
 

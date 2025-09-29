@@ -16,11 +16,5 @@ COPY . .
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
 
-# Define environment variable
-ENV NAME World
-
-# Run the initial training script to generate the model.pkl
-RUN python src/train.py
-
-# Run app.py when the container launches
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run training and then the app when the container launches
+CMD python src/train.py && uvicorn app:app --host 0.0.0.0 --port 8000
