@@ -9,10 +9,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 LOG_FILE = "predictions.log"
-ERROR_THRESHOLD = 2  # Trigger alert if more than 2 errors are found
-ALERT_COOLDOWN_SECONDS = 300 # Wait 5 minutes before sending another alert
+ERROR_THRESHOLD = 2
+ALERT_COOLDOWN_SECONDS = 300
 
-# Get credentials from environment variables
 SENDER_EMAIL = os.getenv("SENDER_EMAIL")
 SENDER_PASSWORD = os.getenv("SENDER_PASSWORD")
 RECEIVER_EMAIL = os.getenv("RECEIVER_EMAIL")
@@ -42,7 +41,6 @@ def send_alert_email(error_count):
     msg['From'] = SENDER_EMAIL
     msg['To'] = RECEIVER_EMAIL
 
-    # Create a secure SSL context
     context = ssl.create_default_context()
 
     try:
@@ -76,7 +74,7 @@ def monitor_logs():
                         else:
                             print(f"Alert condition met ({error_count} errors), but in cooldown period. No email sent.")
             
-            time.sleep(10)  # Check every 10 seconds
+            time.sleep(10)
 
         except KeyboardInterrupt:
             print("\nMonitoring stopped by user.")
